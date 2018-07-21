@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+<link rel="shortcut icon" type="image/x-icon" href="app/icon.png">
+<link rel='stylesheet' href='app/css/style.css'>
+
+<title>Thời Khóa Biểu 12A3</title>
+
+</head>
+<body>
+<script src="app/js/three.min.js" ></script>
+<script src="app/js/tween.min.js" ></script>
+<script src="app/js/TrackballControls.js" ></script>
+<script src="app/js/CSS3DRenderer.js" ></script>
+    
+<div id="container"></div>
+    
+<div id="info">Thời Khóa Biểu 12A3 (23/04/2018)</div>
+<div id="myModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <span class="close">&times;</span>
+            <h3>Thời Khóa Biểu 3D</h3>
+    </div>
+        <div class="modal-body">
+            <p>
+                Nhấn giữ và kéo chuột trái để xoay.
+            </p>
+            <p>
+                Nhấn giữ và kéo chuột phải để trượt.
+            </p>
+            <p>
+                Cuộn chuột để thu phóng.
+            </p>
+		<p>
+		(Nếu chạy trên webview của Facebook, sẽ cho kết quả rất tệ)
+		</p>
+            
+            
+        </div>
+        <div class="modal-footer">
+            
+            <p>
+                Source code base on 3D Periodic Table, by
+                <a href="https://fb.com/wuuyi123" target="_blank">Nguyễn Duy</a>
+            </p>
+            
+        </div>
+        
+    </div>
+</div>
+
+<div id="menu">
+    <button id="update">Refesh</button>
+    <button id="about">Info</button>
+</div>
+    
+  
+<script>
+    
+var modal = document.getElementById('myModal');
+var btn = document.getElementById("about");
+var span = document.getElementsByClassName("close")[0];
+
+btn.onclick = function() {
+    modal.style.display = "block";
+}
+span.onclick = function() {
+    modal.style.display = "none";
+}
+window.onclick = function(event) {
+    if (event.target == modal) {
+        modal.style.display = "none";
+    }
+}
+
+</script>
+    
+<script>
+
+var table = [
+	"[Tiết]", "", "A", 1, 1,
+    "[Thứ 2]", "", "A", 2, 1,
+	"[Thứ 3]", "", "A", 3, 1,
+	"[Thứ 4]", "", "A", 4, 1,
+	"[Thứ 5]", "", "A", 5, 1,
+	"[Thứ 6]", "", "A", 6, 1,
+	"[Thứ 7]", "", "A", 7, 1,
+    
+	"1", "07h00 - 07h45", "A", 1, 2,
+	"2", "07h50 - 08h35", "A", 1, 3,
+	"3", "08h40 - 09h25", "A", 1, 4,
+	"4", "09h50 - 10h35", "A", 1, 5,
+	"5", "10h40 - 11h25", "A", 1, 6,
+	"3", "14h10 - 14h55", "A", 1, 8,
+	"4", "15h20 - 16h05", "A", 1, 9,
+	"5", "16h10 - 16h55", "A", 1, 10,
+	
+    "Anh", "Ái Phương", "", 2, 2,
+	"Anh", "Ái Phương", "", 2, 3,
+	"Hóa", "Diễm Thúy", "", 2, 4,
+	"Lí", "Ngọc Dung", "", 2, 5,
+	"Lí", "Ngọc Dung", "", 2, 6,
+    
+    "Sinh", "Thùy Trang", "", 3, 2,
+	"Sinh", "Thùy Trang", "", 3, 3,
+	"Toán", "Ngọc Luân", "", 3, 4,
+	"Toán", "Ngọc Luân", "", 3, 5,
+	"Anh", "Ái Phương", "", 3, 6,
+    
+    "Lí", "Ngọc Dung", "", 4, 2,
+	"Lí", "Ngọc Dung", "", 4, 3,
+	"Lí", "Ngọc Dung", "", 4, 4,
+	"Văn", "Hữu Nửa", "", 4, 5,
+	"Văn", "Hữu Nửa", "", 4, 6,
+    
+    "Toán", "Ngọc Luân", "", 5, 2,
+	"Toán", "Ngọc Luân", "", 5, 3,
+	"Toán", "Ngọc Luân", "", 5, 4,
+	"Sinh", "Thùy Trang", "", 5, 5,
+	"Sinh", "Thùy Trang", "", 5, 6,
+    
+    "Toán", "Ngọc Luân", "", 6, 2,
+	"Toán", "Ngọc Luân", "", 6, 3,
+	"Văn", "Hữu Nửa", "", 6, 4,
+	"Văn", "Hữu Nửa", "", 6, 5,
+	"Văn", "Hữu Nửa", "", 6, 6,
+    
+    "Hóa", "Diễm Thúy", "", 6, 9,
+	"Hóa", "Diễm Thúy", "", 6, 10,
+    
+    "Hóa", "Diễm Thúy", "", 7, 2,
+	"Hóa", "Diễm Thúy", "", 7, 3,
+	"Hóa", "Diễm Thúy", "", 7, 4,
+	"Anh", "Ái Phương", "", 7, 5,
+	"Anh", "Ái Phương", "", 7, 6,
+];
+
+var camera, scene, renderer;
+var controls;
+
+var objects = [];
+var targets = { table: [], sphere: [], helix: [], grid: [] };
+
+init();
+animate();
+
+function init() {
+
+	camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 10000 );
+	camera.position.z = 3000;
+
+	scene = new THREE.Scene();
+
+	// table
+  
+	for ( var i = 0; i < table.length; i += 5 ) {
+        var type = table[i + 2];
+        
+		var element = document.createElement( 'div' );
+		element.className = 'element';
+        
+        
+        if (type == "A") {
+            element.style.backgroundColor = 'rgba(0,127,255,' + ( Math.random() * 0.5 + 0.25 ) + ')';
+        } else {
+            element.style.backgroundColor = 'rgba(0,127,127,' + ( Math.random() * 0.5 + 0.25 ) + ')';
+        };
+        
+
+		//var number = document.createElement( 'div' );
+		//number.className = 'number';
+		//number.textContent = (i/5) + 1;
+		//element.appendChild( number );
+
+		var symbol = document.createElement( 'div' );
+		symbol.className = 'symbol';
+		symbol.textContent = table[ i ];
+		element.appendChild( symbol );
+
+		var details = document.createElement( 'div' );
+		details.className = 'details';
+		//details.innerHTML = table[ i + 1 ] + '<br>' + table[ i + 2 ];
+		details.innerHTML = table[ i + 1 ];
+		element.appendChild( details );
+
+		var object = new THREE.CSS3DObject( element );
+		object.position.x = Math.random() * 4000 - 2000;
+		object.position.y = Math.random() * 4000 - 2000;
+		object.position.z = Math.random() * 4000 - 2000;
+		scene.add( object );
+
+		objects.push( object );
+
+		//
+
+		var object = new THREE.Object3D();
+		object.position.x = ( table[ i + 3 ] * 425 ) - 1680;
+		object.position.y = - ( table[ i + 4 ] * 180 ) + 990;
+
+		targets.table.push( object );
+
+	}
+
+	// sphere
+
+	var vector = new THREE.Vector3();
+
+	for ( var i = 0, l = objects.length; i < l; i ++ ) {
+
+		var phi = Math.acos( -1 + ( 2 * i ) / l );
+		var theta = Math.sqrt( l * Math.PI ) * phi;
+
+		var object = new THREE.Object3D();
+
+		object.position.x = 800 * Math.cos( theta ) * Math.sin( phi );
+		object.position.y = 800 * Math.sin( theta ) * Math.sin( phi );
+		object.position.z = 800 * Math.cos( phi );
+
+		vector.copy( object.position ).multiplyScalar( 2 );
+
+		object.lookAt( vector );
+
+		targets.sphere.push( object );
+
+	}
+
+	// helix
+
+	var vector = new THREE.Vector3();
+
+	for ( var i = 0, l = objects.length; i < l; i ++ ) {
+
+		var phi = i * 0.175 + Math.PI;
+
+		var object = new THREE.Object3D();
+
+		object.position.x = 900 * Math.sin( phi );
+		object.position.y = - ( i * 8 ) + 450;
+		object.position.z = 900 * Math.cos( phi );
+
+		vector.x = object.position.x * 2;
+		vector.y = object.position.y;
+		vector.z = object.position.z * 2;
+
+		object.lookAt( vector );
+
+		targets.helix.push( object );
+
+	}
+
+	// grid
+
+	for ( var i = 0; i < objects.length; i ++ ) {
+
+		var object = new THREE.Object3D();
+
+		object.position.x = ( ( i % 5 ) * 400 ) - 800;
+		object.position.y = ( - ( Math.floor( i / 5 ) % 5 ) * 400 ) + 800;
+		object.position.z = ( Math.floor( i / 25 ) ) * 1000 - 2000;
+
+		targets.grid.push( object );
+
+	}
+
+	//
+
+	renderer = new THREE.CSS3DRenderer();
+	renderer.setSize( window.innerWidth, window.innerHeight );
+	renderer.domElement.style.position = 'absolute';
+	document.getElementById( 'container' ).appendChild( renderer.domElement );
+
+	//
+
+	controls = new THREE.TrackballControls( camera, renderer.domElement );
+	controls.rotateSpeed = 0.5;
+	controls.minDistance = 500;
+	controls.maxDistance = 6000;
+	controls.addEventListener( 'change', render );
+
+
+    var button = document.getElementById( 'update' );
+	button.addEventListener( 'click', function ( event ) {
+        location.reload();
+
+	}, false );
+
+	transform( targets.table, 5000 );
+
+    //
+    
+	window.addEventListener( 'resize', onWindowResize, false );
+
+}
+
+function transform( targets, duration ) {
+
+	TWEEN.removeAll();
+
+	for ( var i = 0; i < objects.length; i ++ ) {
+
+		var object = objects[ i ];
+		var target = targets[ i ];
+
+		new TWEEN.Tween( object.position )
+			.to( { x: target.position.x, y: target.position.y, z: target.position.z }, Math.random() * duration + duration )
+			.easing( TWEEN.Easing.Exponential.InOut )
+			.start();
+
+		new TWEEN.Tween( object.rotation )
+			.to( { x: target.rotation.x, y: target.rotation.y, z: target.rotation.z }, Math.random() * duration + duration )
+			.easing( TWEEN.Easing.Exponential.InOut )
+			.start();
+
+	}
+
+	new TWEEN.Tween( this )
+		.to( {}, duration * 2 )
+		.onUpdate( render )
+		.start();
+
+}
+
+function onWindowResize() {
+
+	camera.aspect = window.innerWidth / window.innerHeight;
+	camera.updateProjectionMatrix();
+
+	renderer.setSize( window.innerWidth, window.innerHeight );
+
+	render();
+
+}
+
+function animate() {
+
+	requestAnimationFrame( animate );
+
+	TWEEN.update();
+
+	controls.update();
+
+}
+
+
+function render() {
+
+	renderer.render( scene, camera );
+
+}
+
+
+</script>
+</body>
+</html>
